@@ -15,7 +15,7 @@ class Blockchain{
 	protected $main_password; // Main Blockchain Wallet password
 	protected $second_password; // Second Blockchain Wallet password if double encryption is enabled
 	protected $port = 3000; // Blockchain Wallet service port
-	protected $base_url = 'http://127.0.0.1'; // Base url to connect to the Blockchain Waller service
+	protected $base_url = 'http://127.0.0.1'; // Base url to connect to the Blockchain Wallet service
 
 	public function __construct($config)
 	{
