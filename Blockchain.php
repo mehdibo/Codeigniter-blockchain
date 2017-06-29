@@ -6,7 +6,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * Provides easy way to use the Blockchain api
  *
  * @author		Mehdi Bounya
- * @link		
+ * @link		https://github.com/mehdibo/Codeigniter-blockchain
  */
 
 class Blockchain{
