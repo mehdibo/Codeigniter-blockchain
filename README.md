@@ -18,6 +18,7 @@ Start by completing the following steps:
   4. And that's it!
 	
 To use this class outside Codeigniter just remove the following line found in the top:
+
 `defined('BASEPATH') OR exit('No direct script access allowed');`
 
  ## Documentation
