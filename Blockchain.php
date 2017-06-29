@@ -35,11 +35,11 @@ class Blockchain{
 			show_error('Blockchain: Unable to connect to Blockchain Wallet service on: '.$this->base_url.':'.$this->port.'');
 			log_message('error', "Blockchain: Unable to connect to Blockchain Wallet service.");
 		}
-   }
+	}
 
 	// Create a wallet
 	public function create_wallet($options)
- 	{
+	{
 		// Get the base url
 		$url=$this->base_url;
 
@@ -114,7 +114,7 @@ class Blockchain{
 
 		// Execute
 		return $this->execute($url);
-	 }
+	}
 
 	public function send_many($recipients,$from=NULL,$fee=NULL)
 	{
@@ -265,5 +265,5 @@ class Blockchain{
 
 		// Return the decoded response as an associative array
  		return json_decode($response, TRUE);
-	 }
+	}
 }
