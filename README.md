@@ -12,7 +12,7 @@ You will need to run the Blockchain wallet service, Click [here](https://github.
 
 Start by completing the following steps:
 
-  1. Copy `Blockchain.php` to the `/application/libraries` folder.
+  1. Copy `/application/libraries/Blockchain.php` to the `/application/libraries` folder.
   2. Load the library using the Codeigniter loader `$this->load->library('blockchain' , $config)`, 
   3. See the [documentation](#documentation) for usage.
   4. And that's it!
