@@ -38,7 +38,7 @@ Make sure you followed the steps on [Getting Started](#getting-started) first, a
 `$this->blockchain->create_wallet($options)`
 
 Options are:
-  * `password` - The new wallet password, must be at least 10 charachters.
+  * `password` - The new wallet password, must be at least 10 characters.
   * `private_key` - A private key to add to the wallet (Wallet import format preferred). (optional)
   * `email` - An e-mail to associate to the new wallet. (optional)
   * `label` - A label to set for the wallet's first address. (Alphanumeric only) (optional)
@@ -82,3 +82,6 @@ No parameters.
  Parameters are:
   * `label` - Label to attach to the new address. (optional)
   
+  
+  ## Contribution
+If you find any bugs please open an issue, all contributions are welcome.
