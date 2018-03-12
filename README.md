@@ -31,20 +31,20 @@ Make sure you followed the steps on [Getting Started](#getting-started) first, a
   * `main_password` - Main Blockchain password.
   * `second_password` - You need to set this if double encryption is enabled .
   * `api_code` - You API code, required if you are going to use the create_wallet() function.
-  * `base_url` - The base url used for the API. (default:http://127.0.0.1)
-  * `port` - If you would like to set a custom port. (default:3000)
+  * `base_url` - The base url used for the API. (default: http://127.0.0.1)
+  * `port` - If you would like to set a custom port. (default: 3000)
   
   ### Create wallet
-`$this->blockchain->create_wallet($options)`
+`$this->blockchain->create_wallet($password, $private_key = NULL, $email = NULL, $label = NULL)`
 
-Options are:
+Parameters are:
   * `password` - The new wallet password, must be at least 10 characters.
   * `private_key` - A private key to add to the wallet (Wallet import format preferred). (optional)
   * `email` - An e-mail to associate to the new wallet. (optional)
   * `label` - A label to set for the wallet's first address. (Alphanumeric only) (optional)
  
   ### Send funds
-`$this->blockchain->send($to,$amount,$from,$fee)`
+`$this->blockchain->send($to, $amount, $from = NULL, $fee = NULL)`
 
 Parameters are:
   * `to` - Recipient Bitcoin Address.
@@ -53,10 +53,10 @@ Parameters are:
   * `fee` - Transaction fee value in satoshi. (Must be greater than default fee) (Optional)
   
   ### Send to multiple addresses
-`$this->blockchain->send_many($recipients,$from,$fee)`
+`$this->blockchain->send_many($recipients, $from = NULL, $fee = NULL)`
  
  Parameters are:
-  * `recipients` - Recipients Bitcoin Address as an associative array, `$address=>$amount`. (amount in satoshis).
+  * `recipients` - Recipients Bitcoin Address as an associative array, `'address' => 'amount in satoshis'`.
   * `from` - Send from a specific Bitcoin Address. (Optional)
   * `fee` - Transaction fee value in satoshi. (Must be greater than default fee) (Optional)
 
@@ -66,22 +66,23 @@ Parameters are:
 No parameters.
 
   ### List addresses
-`$this->blockchain->wallet_balance()`
+`$this->blockchain->list_addresses()`
 
 No parameters.
 
   ### Get address balance
-`$this->blockchain->wallet_balance($address)`
+`$this->blockchain->address_balance($address)`
   
  Parameters are:
-  * `address` - The bitcoin address to get it's balance.
+  * `address` - Bitcoin address to lookup.
   
   ### Create new address
 `$this->blockchain->new_address($label)`
 
  Parameters are:
-  * `label` - Label to attach to the new address. (optional)
+  * `label` - The new address's label. (optional)
   
-  
+All the methods above will return the decoded JSON response from the server.  
+
   ## Contribution
 If you find any bugs please open an issue, all contributions are welcome.
