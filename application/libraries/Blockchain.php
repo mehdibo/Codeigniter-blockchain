@@ -1,22 +1,76 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+
 /**
- * CodeIgniter Blockchain Class
+ * Blockchain Wallet API
  *
- * Provides easy way to use the Blockchain api
+ * This library allows you to use the Blockchain Wallet API: https://blockchain.info/api/blockchain_wallet_api
+ * In order for this library to work, you need to have the Blockchain Wallet Service installed.
+ * https://github.com/blockchain/service-my-wallet-v3#getting-started
  *
- * @author		Mehdi Bounya
- * @link		https://github.com/mehdibo/Codeigniter-blockchain
+ * @author	Mehdi Bounya
+ * @link	https://github.com/mehdibo/Codeigniter-blockchain
  */
 
 class Blockchain{
-	protected $guid; // Blockchain wallet identifier (Wallet ID)
-	protected $api_code; // API code, required for creating wallets
-	protected $main_password; // Main Blockchain Wallet password
-	protected $second_password; // Second Blockchain Wallet password if double encryption is enabled
-	protected $port = 3000; // Blockchain Wallet service port
-	protected $base_url = 'http://127.0.0.1'; // Base url to connect to the Blockchain Wallet service
+	/**
+	 * Blockchain wallet ID (Wallet ID)
+	 *
+	 * @var string
+	 */
+	protected $guid;
 
+	/**
+	 * API code
+	 *
+	 * API code is required for creating wallets
+	 * You can get one here: https://blockchain.info/api/api_create_code
+	 * 
+	 * @var string
+	 */
+	protected $api_code;
+
+	/**
+	 * Main Blockchain Wallet password
+	 *
+	 * @var string
+	 */
+	protected $main_password;
+
+	/**
+	 * Second Blockchain Wallet password
+	 * 
+	 * Only if double encryption is enabled
+	 *
+	 * @var string
+	 */
+	protected $second_password;
+
+	/**
+	 * Blockchain Wallet Service port
+	 * 
+	 * The one you passed to the `blockchain-wallet-service start` command
+	 *
+	 * @var integer
+	 */
+	protected $port = 3000;
+
+	/**
+	 * URL to the Blockchain Wallet Service
+	 * 
+	 * Usually it's localhost
+	 *
+	 * @var string
+	 */
+	protected $base_url = 'http://127.0.0.1';
+
+	/**
+	 * Constructor
+	 * 
+	 * Load config
+	 *
+	 * @param array $config
+	 */
 	public function __construct($config)
 	{
 		// Set config values
@@ -30,229 +84,198 @@ class Blockchain{
 
 		log_message('info', 'Blockchain Class Initialized');
 
+		// Make sure the base_url doesn't end with a trailing slash
+		$this->base_url = rtrim($this->base_url, '/');
+
 		// Check if the Blockchain Wallet service is running
-		if ($this->execute($this->base_url.':'.$this->port) === NULL) {
-			show_error('Blockchain: Unable to connect to Blockchain Wallet service on: '.$this->base_url.':'.$this->port.'');
-			log_message('error', "Blockchain: Unable to connect to Blockchain Wallet service.");
+		if ($this->_exec('') === NULL) {
+			show_error('Blockchain Wallet: Unable to connect to Blockchain Wallet Service on: '.$this->base_url.':'.$this->port.'');
+			log_message('error', "Blockchain: Unable to connect to Blockchain Wallet Service.");
 		}
 	}
 
-	// Create a wallet
-	public function create_wallet($options)
+	/**
+	 * Create a new wallet
+	 *
+	 * @param string $password	  The new wallet's password, must be at least 10 characters.
+	 * @param string $private_key A private key to add to the wallet (optional)
+	 * @param string $email		  An e-mail to associate with the new wallet. (optional)
+	 * @param string $label		  A label to set for the wallet's first address. (optional)
+	 * 
+	 * @return array API's response
+	 */	
+	public function create_wallet($password, $private_key = NULL, $email = NULL, $label = NULL)
 	{
-		// Get the base url
-		$url=$this->base_url;
-
-		// Add the port
-		$url.=':'.$this->port.'/';
-
-		// Add the api url
-		$url.='api/v2/create';
-
-		// Add options
-		// password
-		$url.='?password='.$options['password'];
-
-		// api_code
-		$url.='&api_code='.$this->api_code;
-
-		// private key (optional)
-		if (isset($options['private_key'])) {
-			$url.='&priv='.$options['private_key'];
+		// Make sure the password is at least 10 chars long
+		if(strlen($password) < 10){
+			return ['error' => 'Password must be at least 10 characters'];
 		}
 
-		// label (optional)
-		if (isset($options['label'])) {
-			$url.='&label='.$options['label'];
-		}
-
-		// email (optional)
-		if (isset($options['email'])) {
-			$url.='&email='.$options['email'];
-		}
+		// Prepare parameters
+		$parameters = [
+			'password' => $password,
+			'api_code' => $this->api_code,
+			'priv' => $private_key,
+			'label' => $label,
+			'email' => $email
+		];
 
 		// Execute
-		return $this->execute($url);
-	 }
-
-	// Send funds
-	public function send($to,$amount,$from=NULL,$fee=NULL)
-	{
-		// Get the base url
-		$url=$this->base_url;
-
-		// Add the port
-		$url.=':'.$this->port.'/';
-
-		// Add the api url
-		$url.='merchant/'.$this->guid.'/payment';
-
-		// Add options
-		// password
-		$url.='?password='.$this->main_password;
-
-		// second password
-		if (!empty($this->second_password)) {
-			$url.='&second_password='.$this->second_password;
-		}
-
-		// Recipient Bitcoin Address
-		$url.='&to='.$to;
-
-		// Amount in satoshi
-		$url.='&amount='.$amount;
-
-		// From Bitcoin address
-		if (!empty($from)) {
-			$url.='&from='.$from;
-		}
-
-		// Transaction fee in satoshi
-		if (!empty($fee)) {
-			$url.='&fee='.$fee;
-		}
-
-		// Execute
-		return $this->execute($url);
+		return $this->_exec('api/v2/create', $parameters);
 	}
 
-	public function send_many($recipients,$from=NULL,$fee=NULL)
+	
+	/**
+	 * Send funds
+	 *
+	 * @param string $to	 Recipient's Bitcoin address.
+	 * @param string $amount Amount to send in Satoshis.
+	 * @param string $from	 Send from a specific Bitcoin address. (optional)
+	 * @param string $fee	 Transaction fee value in satoshi. (Must be greater than default fee) (Optional)
+	 * 
+	 * @return array API's response
+	 */
+	public function send($to, $amount, $from = NULL, $fee = NULL)
 	{
-		// Get the base url
-		$url=$this->base_url;
-
-		// Add the port
-		$url.=':'.$this->port.'/';
-
-		// Add the api url
-		$url.='merchant/'.$this->guid.'/sendmany';
-
-		// Add options
-		// password
-		$url.='?password='.$this->main_password;
-
-		// second password
-		if (!empty($this->second_password)) {
-			$url.='&second_password='.$this->second_password;
-		}
-
-		// Recipients Bitcoin Address
-		$url.='&recipients='.urlencode(json_encode($recipients));
-
-		// From Bitcoin address
-		if (!empty($from)) {
-			$url.='&from='.$from;
-		}
-
-		// Transaction fee in satoshi
-		if (!empty($fee)) {
-			$url.='&fee='.$fee;
-		}
+		// Build parameters
+		$parameters = [
+			'password' => $this->main_password,
+			'to' => $to,
+			'amount' => $amount,
+			'second_password' => $this->second_password,
+			'from' => $from,
+			'fee' => $fee
+		];
 
 		// Execute
-		return $this->execute($url);
+		return $this->_exec('merchant/'.urlencode($this->guid).'/payment', $parameters);
 	}
 
-	// Get balance
+	/**
+	 * Send funds to multiple addresses
+	 *
+	 * @param array $recipients An array of 'address' => 'amount to send in satoshis'.
+	 * @param string $from	 Send from a specific Bitcoin address. (optional)
+	 * @param string $fee	 Transaction fee value in satoshi. (Must be greater than default fee) (Optional)
+	 * 
+	 * @return array API's response
+	 */
+	public function send_many($recipients, $from = NULL, $fee=NULL)
+	{
+		// Build parameters
+		$parameters = [
+			'password' => $this->main_password,
+			'second_password' => $this->second_password,
+			'recipients' => json_encode($recipients),
+			'from' => $from,
+			'fee' => $fee,
+		];
+
+		// Execute
+		return $this->_exec('merchant/'.urlencode($this->guid).'/sendmany', $parameters);
+	}
+
+	/**
+	 * Get wallet's balance
+	 *
+	 * @return array API's response
+	 */
 	public function wallet_balance()
 	{
-		// Get the base url
-		$url=$this->base_url;
-
-		// Add the port
-		$url.=':'.$this->port.'/';
-
-		// Add the api url
-		$url.='merchant/'.$this->guid.'/balance';
-
-		// Add options
-		// password
-		$url.='?password='.$this->main_password;
+		// Build parameters
+		$parameters = [
+			'password' => $this->main_password,
+		];
 
 		// Execute
-		return $this->execute($url);
+		return $this->_exec('merchant/'.urlencode($this->guid).'/balance', $parameters);
 	}
 
+	/**
+	 * List all active addresses
+	 *
+	 * @return array API's response
+	 */
  	public function list_addresses()
 	{
-		// Get the base url
-		$url=$this->base_url;
-
-		// Add the port
-		$url.=':'.$this->port.'/';
-
-		// Add the api url
-		$url.='merchant/'.$this->guid.'/list';
-
-		// Add options
-		// password
-		$url.='?password='.$this->main_password;
+		// Build parameters
+		$parameters = [
+			'password' => $this->main_password,
+		];
 
 		// Execute
-		return $this->execute($url);
+		return $this->_exec('merchant/'.urlencode($this->guid).'/list', $parameters);
 	}
 
+	/**
+	 * Get the balance of a specific address
+	 *
+	 * @param string $address Bitcoin address to lookup
+	 * 
+	 * @return array API's response
+	 */
 	public function address_balance($address)
 	{
-		// Get the base url
-		$url=$this->base_url;
-
-		// Add the port
-		$url.=':'.$this->port.'/';
-
-		// Add the api url
-		$url.='merchant/'.$this->guid.'/address_balance';
-
-		// Add options
-		// password
-		$url.='?password='.$this->main_password;
-
-		// address
-		$url.='&address='.$address;
+		// Build parameters
+		$parameters = [
+			'password' => $this->main_password,
+			'address' => $address
+		];
 
 		// Execute
-		return $this->execute($url);
+		return $this->_exec('merchant/'.urlencode($this->guid).'/address_balance', $parameters);
 	}
 
-	public function new_address($label=NULL)
+	/**
+	 * Generate a new address
+	 *
+	 * @param string $label The new address's label. (optional)
+	 * 
+	 * @return array API's response
+	 */
+	public function new_address($label = NULL)
 	{
-		// Get the base url
-		$url=$this->base_url;
-
-		// Add the port
-		$url.=':'.$this->port.'/';
-
-		// Add the api url
-		$url.='merchant/'.$this->guid.'/new_address';
-
-		// Add options
-		// password
-		$url.='?password='.$this->main_password;
-
-		// second_password
-		if (!empty($this->second_password)) {
-			$url.='&second_password='.$this->second_password;
-		}
-
-		// label
-		if (!empty($label)) {
-			$url.='&label='.$label;
-		}
+		// Build parameters
+		$parameters = [
+			'password' => $this->main_password,
+			'second_password' => $this->second_password,
+			'label' => $label,
+		];
 
 		// Execute
-		return $this->execute($url);
-
+		return $this->_exec('merchant/'.urlencode($this->guid).'/new_address', $parameters);
 	}
 
-	public function execute($url)
+	/**
+	 * Execute an API request
+	 *
+	 * @param string $endpoint	 API's endpoint (the part after the base_url)
+	 * @param array  $parameters Array of GET parameters 'parameter'=>'value'
+	 * 
+	 * @return array API's decoded response
+	 */
+	private function _exec($endpoint, $parameters = NULL)
 	{
+		// Start building URL
+		$url = $this->base_url;
+
+		// Add port
+		$url .= ':'.$this->port.'/';
+
+		// Add endpint
+		$url .= trim($endpoint, '/').'/';
+
+		// Build query
+		if(!empty($parameters)){
+			$url .= '?'.http_build_query($parameters);
+		}
+
 		// Get CURL resource
 		$curl = curl_init();
 		// Set options
 		curl_setopt_array($curl, array(
 			CURLOPT_RETURNTRANSFER => TRUE,
 			CURLOPT_URL => $url,
-			// CURLOPT_SSL_VERIFYPEER => FALSE,
 		));
 
 		// Send the request & save response
