@@ -1,5 +1,6 @@
 # Codeigniter-blockchain
-A simple Codeigniter library to use the Blockchain Wallet API
+This library allows you to use the Blockchain Wallet API, it offers easy to use methods
+that will build the HTTP requests to the service for you.
 ## Contents
 
   * [Getting Started](#getting-started)
@@ -7,7 +8,7 @@ A simple Codeigniter library to use the Blockchain Wallet API
   
  ## Getting Started
 
-To use the blockchain wallet API, make sure you read the [Blockchain API](https://blockchain.info/api) documentations.
+To use the blockchain wallet API, make sure you read the [Blockchain Wallet API](https://blockchain.info/api/blockchain_wallet_api) documentations.
 You will need to run the Blockchain wallet service, Click [here](https://github.com/blockchain/service-my-wallet-v3) for setup instructions.
 
 Start by completing the following steps:
