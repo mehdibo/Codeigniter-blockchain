@@ -3,12 +3,13 @@
     "description": "A CodeIgniter library to use the Blockchain Wallet API",
     "type": "library",
     "keywords": [
-        "codeigniter",
-        "blockchain",
-        "blockchain wallet",
-        "blockchain api"
+        "codeigniter", "blockchain", "blockchain wallet", "blockchain api"
     ],
     "homepage": "https://github.com/mehdibo/Codeigniter-blockchain",
+    "readme": "./README.md",
+    "support": {
+        "issues": "https://github.com/mehdibo/Codeigniter-blockchain/issues"
+    },
     "license": "MIT",
     "authors": [
         {
