@@ -15,6 +15,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Blockchain
 {
 	/**
+	 * CI instance
+	 *
+	 * @var object
+	 */
+	private $_ci;
+
+	/**
 	 * Blockchain wallet ID (Wallet ID)
 	 *
 	 * @var string
@@ -72,21 +79,36 @@ class Blockchain
 	 *
 	 * @param array $config
 	 */
-	public function __construct($config)
+	public function __construct($options = NULL)
 	{
+		$this->_ci =& get_instance();
+
+		// Load config file
+		$this->_ci->config->load('blockchain', TRUE, TRUE);
+
+		$config = array(
+			'guid' => $this->_ci->config->item('guid', 'blockchain'),
+			'main_password' => $this->_ci->config->item('main_password', 'blockchain'),
+			'second_password' => $this->_ci->config->item('second_password', 'blockchain'),
+			'api_code' => $this->_ci->config->item('api_code', 'blockchain'),
+			'base_url' => $this->_ci->config->item('base_url', 'blockchain'),
+			'port' => $this->_ci->config->item('port', 'blockchain'),
+		);
+
+		// Merge loaded configs with passed ones
+		if (is_array($options)) {
+			$config = array_merge($config, $options);
+		}
+
 		// Set config values
 		$this->guid = $config['guid'];
 		$this->main_password = $config['main_password'];
-		// Optional ones
-		$this->api_code = ( isset($config['api_code']) ) ? $config['api_code'] : NULL;
-		$this->second_password = ( isset($config['second_password']) ) ? $config['second_password'] : NULL;
-		$this->base_url = ( isset($config['base_url']) ) ? $config['base_url'] : $this->base_url;
-		$this->port = ( isset($config['port']) ) ? $config['port'] : $this->port;
+		$this->api_code = $config['api_code'];
+		$this->second_password = $config['second_password'];
+		$this->base_url = rtrim($config['base_url'], '/');
+		$this->port = $config['port'];
 
 		log_message('info', 'Blockchain Class Initialized');
-
-		// Make sure the base_url doesn't end with a trailing slash
-		$this->base_url = rtrim($this->base_url, '/');
 
 		// Check if the Blockchain Wallet service is running
 		if ($this->_exec('') === NULL) {
