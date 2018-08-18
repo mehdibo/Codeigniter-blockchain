@@ -1,0 +1,29 @@
+{
+    "name": "mehdibo/codeigniter-blockchain",
+    "description": "A CodeIgniter library to use the Blockchain Wallet API",
+    "type": "library",
+    "keywords": [
+        "codeigniter",
+        "blockchain",
+        "blockchain wallet",
+        "blockchain api"
+    ],
+    "homepage": "https://github.com/mehdibo/Codeigniter-blockchain",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mehdi Bounya",
+            "email": "contact.mehdi@pm.me",
+            "role": "Developer",
+            "homepage": "https://twitter.com/bounyamehdi"
+        }
+    ],
+    "require": {
+        "php": "5.6"
+    },
+    "autoload": {
+        "classmap": [
+            "libraries/Blockchain.php"
+        ]
+    }
+}
