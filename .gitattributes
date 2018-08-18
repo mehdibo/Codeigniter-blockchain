@@ -1,0 +1,10 @@
+# Files that must be ignored when composer is pulling down the library
+
+# Exclude git files
+.gitattributes export-ignore
+.gitignore export-ignore
+
+# Nor the README and the example files
+README.md export-ignore
+CONTRIBUTING.md export-ignore
+ISSUE_TEMPLATE.md export-ignore
