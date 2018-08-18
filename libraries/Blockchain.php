@@ -12,13 +12,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @link	https://github.com/mehdibo/Codeigniter-blockchain
  */
 
-class Blockchain{
+class Blockchain
+{
 	/**
 	 * Blockchain wallet ID (Wallet ID)
 	 *
 	 * @var string
 	 */
-	protected $guid;
+	private $guid;
 
 	/**
 	 * API code
@@ -28,14 +29,14 @@ class Blockchain{
 	 * 
 	 * @var string
 	 */
-	protected $api_code;
+	private $api_code;
 
 	/**
 	 * Main Blockchain Wallet password
 	 *
 	 * @var string
 	 */
-	protected $main_password;
+	private $main_password;
 
 	/**
 	 * Second Blockchain Wallet password
@@ -44,7 +45,7 @@ class Blockchain{
 	 *
 	 * @var string
 	 */
-	protected $second_password;
+	private $second_password;
 
 	/**
 	 * Blockchain Wallet Service port
@@ -53,7 +54,7 @@ class Blockchain{
 	 *
 	 * @var integer
 	 */
-	protected $port = 3000;
+	private $port = 3000;
 
 	/**
 	 * URL to the Blockchain Wallet Service
@@ -62,7 +63,7 @@ class Blockchain{
 	 *
 	 * @var string
 	 */
-	protected $base_url = 'http://127.0.0.1';
+	private $base_url = 'http://127.0.0.1';
 
 	/**
 	 * Constructor
